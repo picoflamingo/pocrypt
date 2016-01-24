@@ -11,6 +11,7 @@ tries, please let me know.
 
 
 HOW TO TRY IT
+--------------------
 Compile with 'make'
 
 Try to run the target binary. it will crash as it has not been crypted. The application
@@ -27,5 +28,6 @@ command-line is pretty easy
 Now you can run again the target binary and verify that the secure function gets executed
 
 TODO
+--------------------
 Add a flag to know if the binary is encoded or no and avoid the crash on non-encoded binaries
 
