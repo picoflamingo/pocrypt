@@ -210,7 +210,6 @@ decrypt_mem (unsigned char *ptr, unsigned char *ptr1)
   /* Caculate size of memory block w.r.t pagestart */
   int psize = (((ptr1 - (unsigned char*)pagestart)));
 
-  printf ("prt:0x%x pagesize:0x%x\n", ptr, -pagesize);
   if (!key)
     {
       fprintf (stderr, "No key set...Aborting\n");
