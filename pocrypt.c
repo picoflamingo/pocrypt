@@ -33,9 +33,9 @@
 
 #include "pocrypt.h"
 
-// Just a probe of concept. We do not care about the key itself
-
-
+// Just one key to work with
+static char *key = NULL;
+static int key_len = 0;
 
 
 int 
@@ -69,7 +69,7 @@ dump_mem (unsigned char *ptr, unsigned char *ptr1)
 void
 dump_elf_info (void *data)
 {
-  /*XXX: This conde only works on 64bits ELF*/
+  /*XXX: This code only works on 64bits ELF*/
   Elf64_Ehdr* hdr = (Elf64_Ehdr *) data; 
   
   printf ("Entry Point: 0x%0x\n", (int) hdr->e_entry);
@@ -87,6 +87,7 @@ open_file (char *fname)
       perror ("open:");
       exit (1);
     }
+
   printf ("+ File '%s' open with fd: %d\n", fname, fd);
 
   return fd;  
@@ -139,7 +140,10 @@ void
 xor_mem (unsigned char *text, int size)
 {
   int i;
-  for (i = 0; i < size; i++) *(text+i) ^= XKEY;
+
+  printf ("+ Decoding %d bytes at %p\n", size, text);
+  for (i = 0; i < size; i++) *(text+i) ^= *(key + (i % key_len));
+
 }
 
 
@@ -152,15 +156,22 @@ xor_section (void *data, Elf64_Shdr *sec)
   int i;
   
   text += offset;
+
+
   printf ("+ XORing %d bytes at %p\n", size, text);
-    
+
+#ifdef DUMP
   printf ("ORIGINAL:\n");
   dump_mem (text, text+size);
+#endif
 
   xor_mem (text, size);
 
+#ifdef DUMP
   printf ("XORed:\n");
   dump_mem (text, text+size);
+#endif
+
 }
 
 
@@ -171,7 +182,13 @@ crypt (char *fname)
   int fd;
   void *data;
   Elf64_Shdr* sec;
-  
+
+  if (!key)
+    {
+      fprintf (stderr, "No key set...Aborting\n");
+      exit (1);
+    }
+
   fd = open_file (fname);
 
   data = map_elf (fd);
@@ -189,12 +206,35 @@ decrypt_mem (unsigned char *ptr, unsigned char *ptr1)
   /* Calculate page boundary for the provided src pointer*/
   size_t pagesize = sysconf(_SC_PAGESIZE);
   uintptr_t pagestart = (uintptr_t)ptr & -pagesize;
-  
+
+  /* Caculate size of memory block w.r.t pagestart */
+  int psize = (((ptr1 - (unsigned char*)pagestart)));
+
+  printf ("prt:0x%x pagesize:0x%x\n", ptr, -pagesize);
+  if (!key)
+    {
+      fprintf (stderr, "No key set...Aborting\n");
+      exit (1);
+    }
+
+  printf ("+ Decoding %p -> %p\n", ptr, ptr1);
+  printf ("+ Changing permissions 0x%0x (0x%x)\n", (int)pagestart, (int)psize);
+
   /* Make the pages writable...*/
-  if (mprotect ((void*)pagestart, ptr1-ptr, PROT_READ | PROT_WRITE | PROT_EXEC) < 0)
+  if (mprotect ((void*)pagestart, psize, PROT_READ | PROT_WRITE | PROT_EXEC) < 0)
     perror ("mprotect:");
   
   xor_mem (ptr, ptr1 - ptr);
   
+}
+
+
+void
+set_key (char *str)
+{
+  if (!key) free (key);
+
+  key = strdup (str);
+  key_len = strlen (str);
 }
 

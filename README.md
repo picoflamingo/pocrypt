@@ -20,12 +20,12 @@ of the memory in the .secure segment
 
 Then encrypt the binary with a command like this
 
-./pocrypter target
+./pocrypter PASSWORD ./target
 
-This is a PoC. The key is fixed. Change the code to use a longer key and get it from the 
-command-line is pretty easy
 
 Now you can run again the target binary and verify that the secure function gets executed
+
+./target PASSWORD
 
 TODO
 --------------------

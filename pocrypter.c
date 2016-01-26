@@ -30,10 +30,12 @@ main (int argc, char *argv[])
   if (argc < 1)
     {
       fprintf (stderr, "Invalid Number of parameters\n");
-      fprintf (stderr, "%s file\n", argv[0]);
+      fprintf (stderr, "%s key file\n", argv[0]);
       exit (1);
     }
 
-  crypt (argv[1]);
+  set_key (argv[1]);
+  crypt (argv[2]);
+
   return 0;
 }

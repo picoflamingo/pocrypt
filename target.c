@@ -18,26 +18,39 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include "pocrypt.h"
 
 
-SECURE_FUNC void
+SECURE_FUNC int
 my_secure_function (char *str)
 {
   printf ("You said: %s\n", str);
+  return 0;
 }
 
 /* End of secure region mark */
 SECURE_FUNC void dummy (){};
 
 int 
-main ()
+main (int argc, char *argv[])
 {
   printf ("Hello. I'm a target\n");
+  if (argc != 2)
+    {
+      fprintf (stderr, "I need a key\n");
+      return 1;
+    }
+#ifdef DUMP
+  dump_mem ((unsigned char*)&my_secure_function, (unsigned char*)&dummy);
+#endif
 
-  dump_mem ((unsigned char*)&my_secure_function, (unsigned char*)&dummy);
+  set_key (argv[1]);
   decrypt_mem ((unsigned char*)&my_secure_function, (unsigned char*)&dummy);
+
+#ifdef DUMP
   dump_mem ((unsigned char*)&my_secure_function, (unsigned char*)&dummy);
+#endif
 
   my_secure_function ("Bye!\n");
 
