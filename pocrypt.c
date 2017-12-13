@@ -177,7 +177,7 @@ xor_section (void *data, Elf64_Shdr *sec)
 
 
 void 
-crypt (char *fname)
+crypt (char *sname, char *fname)
 {
   int fd;
   void *data;
@@ -192,12 +192,12 @@ crypt (char *fname)
   fd = open_file (fname);
 
   data = map_elf (fd);
-  sec = find_section (data, ".secure");
+  sec = find_section (data, sname);
 
   xor_section (data, sec);
 
   close (fd);
-  exit (1);
+  
 }
 
 void
