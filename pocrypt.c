@@ -192,12 +192,13 @@ crypt (char *sname, char *fname)
   fd = open_file (fname);
 
   data = map_elf (fd);
+
   sec = find_section (data, sname);
 
   xor_section (data, sec);
 
   close (fd);
-  
+
 }
 
 void
