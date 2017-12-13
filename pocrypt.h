@@ -42,7 +42,7 @@ extern "C" {
 
   void         xor_section (void *data, Elf64_Shdr *sec);
   void         xor_mem (unsigned char *text, int size);
-  void         crypt (char *fname);
+  void         crypt (char *secname, char *fname);
   void         decrypt (char *fname);
   void         decrypt_mem (unsigned char *ptr, unsigned char *ptr1);
 
