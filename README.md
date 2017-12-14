@@ -20,7 +20,7 @@ of the memory in the .secure segment
 
 Then encrypt the binary with a command like this
 
-./pocrypter PASSWORD ./target
+./pocrypter PASSWORD .secure ./target
 
 
 Now you can run again the target binary and verify that the secure function gets executed
